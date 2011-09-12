@@ -1,0 +1,958 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: UTS
+
+; Microsoft Dynamics String : CIT_BUISPEName déchargé
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #CIT_BUISPEName
+  STRING
+    PROPERTIES
+      Name                #CIT_BUISPEName
+      Label               #Name of BUI-SPE
+      StringSize          #50
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: UTS
+
+; Microsoft Dynamics String : CIT_BUISPENum déchargé
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #CIT_BUISPENum
+  STRING
+    PROPERTIES
+      Name                #CIT_BUISPENum
+      Label               #Num of BUI-SPE
+      StringSize          #15
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: UTS
+
+; Microsoft Dynamics String : CIT_AxProjectName déchargé
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #CIT_AxProjectName
+  STRING
+    PROPERTIES
+      Name                #CIT_AxProjectName
+      Label               #Ax Project Name
+      StringSize          #40
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+      TYPEREFERENCETYPE DATASET
+      PROPERTIES
+        Table               #CIT_ProjAxList
+        RelatedField        #AxProjectName
+      ENDPROPERTIES
+      
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: UTS
+
+; Microsoft Dynamics String : CIT_CustCode déchargé
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #CIT_CustCode
+  STRING
+    PROPERTIES
+      Name                #CIT_CustCode
+      Label               #Customer code
+      StringSize          #3
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+      TYPEREFERENCETYPE DATASET
+      PROPERTIES
+        Table               #CIT_Cust
+        RelatedField        #CIT_CustCode
+      ENDPROPERTIES
+      
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: UTS
+
+; Microsoft Dynamics String : CIT_ShortProjectName déchargé
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #CIT_ShortProjectName
+  STRING
+    PROPERTIES
+      Name                #CIT_ShortProjectName
+      Label               #Description rapide
+      StringSize          #60
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: DBE
+
+; Microsoft Dynamics Enumtype : CIT_ProjectType unloaded
+; --------------------------------------------------------------------------------
+  ENUMTYPEVERSION 1
+  
+  ENUMTYPE #CIT_ProjectType
+    PROPERTIES
+      Name                #CIT_ProjectType
+      Label               #Project Type
+      UseEnumValue        #Yes
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+      #SPE
+      PROPERTIES
+        Name                #SPE
+        Label               #SPE
+        EnumValue           #0
+      ENDPROPERTIES
+      
+      #FIX
+      PROPERTIES
+        Name                #FIX
+        Label               #FIX
+        EnumValue           #1
+      ENDPROPERTIES
+      
+    ENDTYPEELEMENTS
+  ENDENUMTYPE
+  
+
+***Element: MCR
+
+; Microsoft Dynamics Macro : CIT_ProjectUtilities déchargé
+; --------------------------------------------------------------------------------
+  JOBVERSION 1
+  
+  SOURCE #CIT_ProjectUtilities
+    ##define.zipCommand('\\frpar-file02\Data\Misc Software\7za465')
+  ENDSOURCE
+
+***Element: CLS
+
+; Microsoft Dynamics Class : CIT_ProjectDeliver déchargé
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #CIT_ProjectDeliver
+    PROPERTIES
+      Name                #CIT_ProjectDeliver
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #canDeliverProject
+        #/*
+        #    In charge to compile project and check if no compile error exist
+        #
+        #*/
+        #private boolean canDeliverProject()
+        #{
+        #
+        #
+        #    tmpCompilerOutput tmpCompilerOutput;
+        #    SysCompilerOutput compiler;
+        #    RecId cnt;
+        #    ;
+        #
+        #    /*
+        #    delete_from tmpCompilerOutput
+        #         index TabSeverityIdx
+        #         where tmpCompilerOutput.SysCompilerOutputTab   == SysCompilerOutputTab::Error
+        #            && tmpCompilerOutput.SysCompilerSeverity    == SysCompilerSeverity::Error;
+        #
+        #
+        #
+        #    //compiler.reset(false);
+        #    SysCompilerOutput::setCompilerTarget(SysCompilerTarget::CompilerDialog);
+        #    SysUserInfo::compilerTarget(SysCompilerTarget::CompilerDialog);
+        #    compiler = new SysCompilerOutput();
+        #    projNode.AOTcompile(1);
+        #
+        #    cnt = compiler.getErrorCnt();
+        #
+        #        select count(RecId) from  tmpCompilerOutput
+        #         index TabSeverityIdx
+        #         where tmpCompilerOutput.SysCompilerOutputTab   == SysCompilerOutputTab::Error
+        #            && tmpCompilerOutput.SysCompilerSeverity    == SysCompilerSeverity::Error;
+        #    */
+        #    projNode.AOTcompile(1);
+        #
+        #    return true;
+        #}
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #class CIT_ProjectDeliver
+        #{
+        #
+        #    CIT_AxProjectName projectName;
+        #
+        #    boolean exportXPO;
+        #    boolean exportDevReport;
+        #    boolean zipPackage;
+        #
+        #    FilePath        documentsPath;
+        #    FileName        bundleName;
+        #
+        #    ProjectNode         projNode;
+        #
+        #}
+      ENDSOURCE
+      SOURCE #createZipFile
+        #void createZipFile()
+        #{
+        #    #file
+        #    Filepath zipPath, zipRegexp, BatPath;
+        #    str cmd;
+        #    TextIO  Io;
+        #    str 1 fileMode;
+        #    ;
+        #    //w:\"Misc Software"\7za465\7za.exe a -tzip c:\test.zip c:\test\*.*
+        #    if (WinAPI::fileExists("\\\\frpar-file02\\Developpement\\7za465\\7za.exe"))
+        #    {
+        #
+        #        zipPath = Path::join([documentsPath, strfmt("%1.%2", bundleName, "zip")]);
+        #        zipRegexp = Path::join([documentsPath , "*.*"]);
+        #        batPath = Path::join([documentsPath, strfmt("%1.%2", bundleName, "bat")]);
+        #
+        #        cmd = strfmt("\\\\frpar-file02\\Developpement\\7za465\\7za.exe a -tzip \"%1\" \"%2\"" , zipPath, zipRegexp );
+        #
+        #        if (BatPath)
+        #        {
+        #
+        #            fileMode = WinApi::fileExists(BatPath) ? #io_append : #io_write;
+        #            Io = new TextIO(BatPath,fileMode);
+        #            if (fileMode ==  #io_append)
+        #                Io.write("\r");
+        #            if (Io)
+        #                Io.write(cmd);
+        #        }
+        #        Io = null;
+        #        WinAPI::shellExecute(batPath);
+        #        WinAPI::deleteFile(batPath);
+        #
+        #    }
+        #    else
+        #        info("Cannot find zip command");
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #exportDevReport
+        #void exportDevReport()
+        #{
+        #}
+      ENDSOURCE
+      SOURCE #exportXPO
+        #void exportXPO()
+        #{
+        #    #File
+        #    Filename xpoName;
+        #    ;
+        #
+        #    xpoName = projNode.AOTname() + #xpo;
+        #    projNode.treeNodeExport(Path::join([documentsPath,xpoName]));
+        #}
+      ENDSOURCE
+      SOURCE #generateDocumentPath
+        #void generateDocumentPath()
+        #{
+        #    #WINAPI
+        #    Filepath path;
+        #
+        #
+        #    ;
+        #    if (!bundleName)
+        #        bundleName = projNode.AOTname();
+        #    path = WinAPI::getFolderPath(#CSIDL_PERSONAL);
+        #
+        #    path = Path::join([path, "Dynamics Project"]);
+        #    if (!WinAPI::folderExists(path))
+        #        WinAPI::createDirectory(path);
+        #
+        #    path = Path::join([path, bundleName]);
+        #    if (!WinAPI::folderExists(path))
+        #        WinAPI::createDirectory(path);
+        #
+        #    documentsPath = path;
+        #
+        #
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #makeDeliver
+        #void makeDeliver()
+        #{
+        #    ;
+        #    if (this.canDeliverProject())
+        #    {
+        #        this.generateDocumentPath();
+        #
+        #        if (exportXPO)
+        #            this.exportXPO();
+        #
+        #        if (exportDevReport)
+        #            this.exportDevReport();
+        #
+        #        if (zipPackage)
+        #            this.createZipFile();
+        #
+        #    }
+        #    else
+        #        throw error(strfmt("Project %1 does not compile. Please check !", projectName));
+        #
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #void new(CIT_AxProjectName _projectName, boolean _exportXPO, boolean _exportDevReport, boolean _zipPackage)
+        #{
+        #    ;
+        #    projectName = _projectName;
+        #
+        #    projNode = SysTreeNode::getSharedProject().AOTfindChild(projectName);
+        #
+        #    if (!projNode)
+        #        throw error(strfmt("Project %1 does not exist on shared project", projectName));
+        #
+        #    exportXPO = _exportXPO;
+        #    exportDevReport = _exportDevReport;
+        #    zipPackage = _zipPackage;
+        #}
+      ENDSOURCE
+      SOURCE #parmBundleName
+        #Filename parmBundleName(Filename _bundleName)
+        #{
+        #    ;
+        #    bundleName = _bundleName;
+        #    return bundleName;
+        #}
+      ENDSOURCE
+      SOURCE #parmExportDevReport
+        #boolean parmExportDevReport(boolean _exportDevReport = exportDevReport)
+        #{
+        #    exportDevReport = _exportDevReport;
+        #    return exportXPO;
+        #}
+      ENDSOURCE
+      SOURCE #parmExportXPO
+        #boolean parmExportXPO(boolean _exportXPO = exportXPO)
+        #{
+        #    exportXPO = _exportXPO;
+        #    return exportXPO;
+        #}
+      ENDSOURCE
+      SOURCE #parmZipPackage
+        #boolean parmZipPackage(boolean _zipPackage = zipPackage)
+        #{
+        #    zipPackage = _zipPackage;
+        #    return zipPackage;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics Class : CIT_ProjectGenerator déchargé
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #CIT_ProjectGenerator
+    PROPERTIES
+      Name                #CIT_ProjectGenerator
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #addStandardNodeToProject
+        #private void addStandardNodeToProject()
+        #{
+        #    ProjectGroupNode    subGroupNode;
+        #    ;
+        #
+        #    projNode.lockUpdate();
+        #    projNodeRoot = projNode;
+        #
+        #    subGroupNode = this.createGroup(20, #MenuItemsPath, projNodeRoot);
+        #    this.createGroup(21, #MenuItemsDisplayPath,  subGroupNode);
+        #    this.createGroup(22, #MenuItemsOutputPath,   subGroupNode);
+        #    this.createGroup(23, #MenuItemsActionPath,   subGroupNode);
+        #
+        #    this.createGroup(19, #MenusPath,             projNodeRoot);
+        #    this.createGroup(17, #QueriesPath,           projNodeRoot);
+        #    this.createGroup(18, #JobsPath,              projNodeRoot);
+        #    this.createGroup(16, #ReportsPath,           projNodeRoot);
+        #    this.createGroup(15, #FormsPath,             projNodeRoot);
+        #    this.createGroup(14, #ClassesPath,           projNodeRoot);
+        #    this.createGroup(13, #MacrosPath,            projNodeRoot);
+        #
+        #    subGroupNode  = this.createGroup(01, #DataDictionaryPath, projNodeRoot);
+        #    this.createGroup(12, #PerspectivesPath,      subGroupNode);
+        #    this.createGroup(11, #TableCollectionsPath,  subGroupNode);
+        #    this.createGroup(10, #SecurityKeysPath,      subGroupNode);
+        #    this.createGroup(09, #ConfigurationKeysPath, subGroupNode);
+        #    this.createGroup(08, #LicenseCodesPath,      subGroupNode);
+        #    this.createGroup(06, #BaseEnumsPath,         subGroupNode);
+        #    this.createGroup(05, #ExtendedDataTypesPath, subGroupNode);
+        #    this.createGroup(04, #ViewsPath,             subGroupNode);
+        #    this.createGroup(03, #TableMapsPath,         subGroupNode);
+        #    this.createGroup(02, #TablesPath,            subGroupNode);
+        #
+        #
+        #    projNode.unlockUpdate();
+        #
+        #}
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #class CIT_ProjectGenerator
+        #{
+        #    #AOT
+        #
+        #    CIT_AxProjectName       fullProjectName;
+        #
+        #    CIT_BUISPEName          BUISPEName;
+        #    CIT_BUISPENum           BUISPENum;
+        #
+        #    CIT_CustCode            custCode;
+        #    CIT_ProjectType         projectType;
+        #
+        #    ProjectNode         projNode;
+        #    TreeNode            projNodeRoot;
+        #
+        #}
+      ENDSOURCE
+      SOURCE #createGroup
+        #//Methods creates sub groups in the Project Node
+        #private ProjectGroupNode createGroup(int _nIndex, str _nodeName,
+        #                                     ProjectGroupNode parent = projNodeRoot)
+        #{
+        #    TreeNodeName     projNodeName = SysTreeNode::pathName(_nodeName);
+        #    ProjectGroupNode child;
+        #    boolean          isGroupNode = false;
+        #    ;
+        #
+        #    if (parent)
+        #        child = parent.aotFindChild(projNodeName);
+        #
+        #    if (!child)
+        #    {
+        #        parent.aotAdd(projNodeName);
+        #        child = parent.aotFindChild(projNodeName);
+        #    }
+        #
+        #    child.projectGroupType(SysTreeNode::path2ProjectGroupNodeType(_nodeName));
+        #
+        #    return child;
+        #}
+      ENDSOURCE
+      SOURCE #createNewSharedPrivateProject
+        #private void createNewSharedPrivateProject()
+        #{
+        #    ProjectNode      upgradeNode;
+        #    TreeNode         treeNodeProject;
+        #    ;
+        #
+        #    treeNodeProject = SysTreeNode::getSharedProject();
+        #
+        #    if (!treeNodeProject.AOTfindChild(fullProjectName))
+        #        projNodeRoot = treeNodeProject.AOTadd(fullProjectName);
+        #
+        #    upgradeNode = treeNodeProject.AOTfindChild(fullProjectName);
+        #    projNode = upgradeNode.getRunNode();
+        #
+        #}
+      ENDSOURCE
+      SOURCE #generate
+        #void generate()
+        #{
+        #    ;
+        #    this.generateprojectName();
+        #    this.createNewSharedPrivateProject();
+        #    this.addStandardNodeToProject();
+        #    projNodeRoot.AOTsave();
+        #    projNode.AOTsave();
+        #
+        #}
+      ENDSOURCE
+      SOURCE #generateprojectName
+        #private void generateprojectName()
+        #{
+        #
+        #    if (fullProjectName == "")
+        #        fullProjectName = CIT_ProjectGenerator::generateProjectNameFrom(custCode, projectType,BUISPENum, BUISPEName);
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #void new(CIT_AxProjectName _projectName = "")
+        #{
+        #    ;
+        #    fullProjectName = _projectName;
+        #}
+      ENDSOURCE
+      SOURCE #parmAxProjectName
+        #CIT_AxProjectName parmAxProjectName(CIT_AxProjectName _axProjectName = fullProjectName)
+        #{
+        #    fullProjectName = _axProjectName;
+        #    return _axProjectName;
+        #}
+      ENDSOURCE
+      SOURCE #parmBUISPEName
+        #CIT_BUISPENum parmBUISPEName(CIT_BUISPENum _BUISPEName = BUISPEName)
+        #{
+        #    BUISPEName = _BUISPEName;
+        #    return BUISPEName;
+        #}
+      ENDSOURCE
+      SOURCE #parmBUISPENum
+        #CIT_BUISPENum parmBUISPENum(CIT_BUISPENum _BUISPENum = BUISPENum)
+        #{
+        #    BUISPENUm = _BUISPENum;
+        #    return BUISPENum;
+        #}
+      ENDSOURCE
+      SOURCE #parmCustCode
+        #CIT_CustCode parmCustCode(CIT_CustCode _custCode = custCode)
+        #{
+        #    custCode = _custCode;
+        #    return custCode;
+        #}
+      ENDSOURCE
+      SOURCE #parmProjectType
+        #CIT_ProjectType parmProjectType(CIT_ProjectType _projectType)
+        #{
+        #    ;
+        #    projectType = _projectType;
+        #    return projectType;
+        #}
+      ENDSOURCE
+      SOURCE #constructFrom
+        #static CIT_ProjectGenerator constructFrom(CIT_CustCode      _custCode,
+        #                                          CIT_ProjectType   _projectType,
+        #                                          CIT_BUISPENum     _BUISPENum,
+        #                                          CIT_BUISPEName    _BUISPEName)
+        #{
+        #    CIT_ProjectGenerator projectGenerator;
+        #    ;
+        #    projectGenerator = new CIT_ProjectGenerator("");
+        #    projectGenerator.parmCustCode(_custCode);
+        #    projectGenerator.parmProjectType(_projectType);
+        #    projectGenerator.parmBUISPENum(_BUISPENum);
+        #    projectGenerator.parmBUISPEName(_BUISPEName);
+        #
+        #    return projectGenerator;
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #generateProjectNameFrom
+        #static CIT_axProjectName generateProjectNameFrom(CIT_CustCode _custCode = "",
+        #                                                 CIT_ProjectType _projectType = CIT_ProjectType::SPE,
+        #                                                 CIT_BUISPENum _BUISPENum = "",
+        #                                                 CIT_BUISPEName _BUISPEName = "")
+        #{
+        #    CIT_AxProjectName projectNameTemplate;
+        #    ;
+        #
+        #    //Change this template to change the name of the generated project
+        #    projectNameTemplate = "%1_%2_%3_%4";
+        #
+        #    return strfmt(projectNameTemplate, _custCode, enum2str(_projectType), _BUISPENum, _BUISPEName);
+        #
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: JOB
+
+; Microsoft Dynamics Job : test_ProjectDeliver déchargé
+; --------------------------------------------------------------------------------
+  JOBVERSION 1
+  
+  SOURCE #test_ProjectDeliver
+    #static void test_ProjectDeliver(Args _args)
+    #{
+    #    CIT_ProjectDeliver projectDeliver;
+    #    ;
+    #    projectDeliver = new CIT_ProjectDeliver("SuperProject", true, true, true);
+    #    projectDeliver.makeDeliver();
+    #
+    #}
+  ENDSOURCE
+
+***Element: JOB
+
+; Microsoft Dynamics Job : test_ProjectGenerator déchargé
+; --------------------------------------------------------------------------------
+  JOBVERSION 1
+  
+  SOURCE #test_ProjectGenerator
+    #static void test_ProjectGenerator(Args _args)
+    #{
+    #
+    #    CIT_ProjectGenerator projectGenerator;
+    #    ;
+    #    //Generate project automaticaly from provided parameters
+    #    projectGenerator =  CIT_ProjectGenerator::constructFrom("CIT", CIT_ProjectType::SPE, "TT01", "MyAwesomeTestProject");
+    #    projectGenerator.generate();
+    #
+    #    //Generate project automaticaly from prodided name (ie does not generate a name)
+    #    projectGenerator = new CIT_ProjectGenerator("SuperProject");
+    #    projectGenerator.generate();
+    #
+    #
+    #
+    #
+    #}
+  ENDSOURCE
+
+***Element: PRN
+
+; Microsoft Dynamics Project : CIT_ProjectUtilies unloaded
+; --------------------------------------------------------------------------------
+  PROJECTVERSION 2
+  
+  PROJECT #CIT_ProjectUtilies
+   SHARED
+  PROPERTIES
+    Name                #CIT_ProjectUtilies
+  ENDPROPERTIES
+  
+    GROUP #Data Dictionary
+      PROPERTIES
+        Name                #Data Dictionary
+        ProjectGroupType    #DataDictionary
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      GROUP #Views
+        PROPERTIES
+          Name                #Views
+          ProjectGroupType    #Views
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Tables
+        PROPERTIES
+          Name                #Tables
+          ProjectGroupType    #Tables
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Maps
+        PROPERTIES
+          Name                #Maps
+          ProjectGroupType    #Maps
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Extended Data Types
+        PROPERTIES
+          Name                #Extended Data Types
+          ProjectGroupType    #ExtendedDataTypes
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 50081
+          NODETYPE 234
+          NAME #CIT_BUISPEName
+        ENDNODE
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 50080
+          NODETYPE 234
+          NAME #CIT_BUISPENum
+        ENDNODE
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 50074
+          NODETYPE 234
+          NAME #CIT_AxProjectName
+        ENDNODE
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 50076
+          NODETYPE 234
+          NAME #CIT_CustCode
+        ENDNODE
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 50079
+          NODETYPE 234
+          NAME #CIT_ShortProjectName
+        ENDNODE
+        ENDGROUP
+        
+      GROUP #Base Enums
+        PROPERTIES
+          Name                #Base Enums
+          ProjectGroupType    #BaseEnums
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 40
+          UTILOBJECTID 50022
+          NODETYPE 209
+          NAME #CIT_ProjectType
+        ENDNODE
+        ENDGROUP
+        
+      GROUP #Configuration Keys
+        PROPERTIES
+          Name                #Configuration Keys
+          ProjectGroupType    #ConfigurationKeys
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Security Keys
+        PROPERTIES
+          Name                #Security Keys
+          ProjectGroupType    #SecurityKeys
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Table Collections
+        PROPERTIES
+          Name                #Table Collections
+          ProjectGroupType    #TableCollections
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      ENDGROUP
+      
+    GROUP #Macros
+      PROPERTIES
+        Name                #Macros
+        ProjectGroupType    #Macros
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 4
+        UTILOBJECTID 0
+        NODETYPE 218
+        NAME #CIT_ProjectUtilities
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #Classes
+      PROPERTIES
+        Name                #Classes
+        ProjectGroupType    #Classes
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 50059
+        NODETYPE 329
+        NAME #CIT_ProjectDeliver
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 50057
+        NODETYPE 329
+        NAME #CIT_ProjectGenerator
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #Forms
+      PROPERTIES
+        Name                #Forms
+        ProjectGroupType    #Forms
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      ENDGROUP
+      
+    GROUP #Reports
+      PROPERTIES
+        Name                #Reports
+        ProjectGroupType    #Reports
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      GROUP #Report Templates
+        PROPERTIES
+          Name                #Report Templates
+          ProjectGroupType    #ReportTemplates
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      ENDGROUP
+      
+    GROUP #Queries
+      PROPERTIES
+        Name                #Queries
+        ProjectGroupType    #Queries
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      ENDGROUP
+      
+    GROUP #Jobs
+      PROPERTIES
+        Name                #Jobs
+        ProjectGroupType    #Jobs
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 5
+        UTILOBJECTID 0
+        NODETYPE 215
+        NAME #test_ProjectDeliver
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 5
+        UTILOBJECTID 0
+        NODETYPE 215
+        NAME #test_ProjectGenerator
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #Menus
+      PROPERTIES
+        Name                #Menus
+        ProjectGroupType    #Menues
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      ENDGROUP
+      
+    GROUP #Menu Items
+      PROPERTIES
+        Name                #Menu Items
+        ProjectGroupType    #MenuItems
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      GROUP #Display
+        PROPERTIES
+          Name                #Display
+          ProjectGroupType    #Display
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Output
+        PROPERTIES
+          Name                #Output
+          ProjectGroupType    #Output
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      GROUP #Action
+        PROPERTIES
+          Name                #Action
+          ProjectGroupType    #Action
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        ENDGROUP
+        
+      ENDGROUP
+      
+  ENDPROJECT
+  
+
+***Element: END
