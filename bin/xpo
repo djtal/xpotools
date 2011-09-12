@@ -2,6 +2,7 @@
 
 require "../lib/xpotools"
 
-parser = Xpotools::XPOParser.new(File.read("../test/SharedProject_CIT_ProjectUtilies.xpo"))
+
+parser = Xpotools::XPOParser.new(File.read(ARGV.first))
 parser.parse
 parser.inspect

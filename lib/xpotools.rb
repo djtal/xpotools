@@ -5,9 +5,10 @@ module Xpotools
   class AOTElement
     attr_accessor :type, :name, :source
     
-    def initialize(type, name)
+    def initialize(type, name, src = "")
       @type = type.downcase.to_sym
       @name = name
+      @source = src
     end
     
     def inspect
@@ -31,23 +32,40 @@ module Xpotools
       open = false
       curelt = ""
       name = ""
+      src = ""
+      type = nil
       @source.each_line do |line|
         if line =~ /\*{3}Element:\s*(\w*)/
+          src = ""
+          name = ""
+          curelt = ""
+          open = false
           elt = true
-          #p "#{line} : #{$1}"
+          type = $1
         end
-        if elt && line =~ /\s*(USERTYPE|CLASS|PROJECT)\s*#(\w*)/
+        
+        if elt && line =~ /\s*(USERTYPE|ENUMTYPE|CLASS|PROJECT)\s*#(\w*)/
           curelt = $1
           name = $2
           open = true
-          #p "type : #{$1} name : #{$2}"
+        elsif elt && type =~ /(MCR|JOB)/
+          if line =~ /\s*SOURCE\s*#(\w*)/
+            name = $1
+            open = true
+            curelt = "SOURCE"
+          end
         end
+
         
-        if open && line.match("END#{curelt}")
+        if open && line.match("\s*END#{curelt}\s*")
           open = false
           elt = false
-          @objects << AOTElement.new(curelt, name)
-          #p "end #{curelt}"
+          src << line
+          @objects << AOTElement.new(curelt, name, src)
+        end
+        
+        if elt
+          src << line
         end
           
       end
